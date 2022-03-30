@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <title>YouTube Mixer - https://developers.google.com/youtube/iframe_api_reference</title>
+  <body>
+
+    <style>
+        .slidecontainer {
+        width: 100%; /* Width of the outside container */
+        }
+
+        /* The slider itself */
+        .slider {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 100%; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+        }
+
+        /* Mouse-over effects */
+        .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+        }
+
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: #04AA6D; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+        }
+
+        .slider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: #04AA6D; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+        }
+
+        .mixer {
+            width: 20%;
+        }
+
+        .controls {
+            align-items: center;
+        }
+    </style>
+
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div id="player"></div>
+    <div id="playerRight"></div>
+    <div id="controls">
+        <input type="button" id="Play" class="btn btn-primary" value="Play" />
+        <input type="button" id="Stop" class="btn btn-primary" value="Stop" />
+    </div>
+    <div id="mixer" class="mixer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        <p>Value: <span id="slider"></span></p>
+    </div>
+
+    <script>
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: '3K8dNctci1Y',
+          playerVars: {
+            'playsinline': 1,
+            'autoplay': 0,
+            'controls': 1,
+            'showinfo': 0,
+            // 'modestbranding': 0,
+            // 'loop': 1,
+            // 'fs': 0,
+            // 'cc_load_policty': 0,
+            // 'iv_load_policy': 3
+
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+
+        playerRight = new YT.Player('playerRight', {
+          height: '390',
+          width: '640',
+          videoId: 'Z26BvHOD_sg',
+          playerVars: {
+            'playsinline': 1,
+            'autoplay': 0,
+            'controls': 1,
+            'showinfo': 0,
+            // 'modestbranding': 0,
+            // 'loop': 1,
+            // 'fs': 0,
+            // 'cc_load_policty': 0,
+            // 'iv_load_policy': 3
+
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+    }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+        //event.target.mute();
+        balanceVolume()
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
+          //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
+          done = true;
+        }
+      }
+      function stopVideo() {
+        player.stopVideo();
+        playerRight.stopVideo();
+      }
+      function setVolume(volume) {
+        player.setVolume(100 - volume)
+        playerRight.setVolume(volume)
+
+    }
+      function getVolume() {
+        return player.getVolume()
+      }
+
+    /*** Slider ****************************************/
+    var slider = document.getElementById("myRange");
+    var output = document.getElementById("slider");
+    output.innerHTML = slider.value; // Display the default slider value
+
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+        setVolume(this.value)
+    }
+
+    function balanceVolume(){
+        slider.volume = 0
+    }
+
+    </script>
+  </body>
+</html>
+
