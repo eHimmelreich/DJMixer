@@ -53,14 +53,21 @@
     </style>
 
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-    <div id="player"></div>
+    <div id="playerLeft"></div>
+    <div id="playlistLeft">
+
     <div id="playerRight"></div>
+    <div id="playlistRight">
+
     <div id="controls">
-        <input type="button" id="Play" class="btn btn-primary" value="Play" />
-        <input type="button" id="Stop" class="btn btn-primary" value="Stop" />
+        <!--input type="button" id="Play" class="btn btn-primary" value="Play" /-->
+        <input type="button" id="Stop All" class="btn btn-primary" value="Stop" />
+        <input type="button" id="Resume" class="btn btn-primary" value="Resume" />
     </div>
     <div id="mixer" class="mixer">
+        <input type="button" id="fade-left" class="btn btn-primary" value="<<<<< Fade Left" />
         <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        <input type="button" id="fade-right" class="btn btn-primary" value="Fade Right >>>>>" />
         <p>Value: <span id="slider"></span></p>
     </div>
 
@@ -74,12 +81,12 @@
 
       // 3. This function creates an <iframe> (and YouTube player)
       //    after the API code downloads.
-      var player;
+      var playerLeft;
       function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', {
+        playerLeft = new YT.Player('playerLeft', {
           height: '390',
           width: '640',
-          videoId: '3K8dNctci1Y',
+          videoId: 'fI7mF5CTvcM',
           playerVars: {
             'playsinline': 1,
             'autoplay': 0,
@@ -101,7 +108,7 @@
         playerRight = new YT.Player('playerRight', {
           height: '390',
           width: '640',
-          videoId: 'Z26BvHOD_sg',
+          videoId: 'qlmOSPnlmww',
           playerVars: {
             'playsinline': 1,
             'autoplay': 0,
@@ -124,6 +131,11 @@
       // 4. The API will call this function when the video player is ready.
       function onPlayerReady(event) {
         event.target.playVideo();
+
+        playlist = ['qlmOSPnlmww', 'fI7mF5CTvcM']
+
+        playerLeft.loadPlaylist(playlist,0, 0)             
+        playerRight.loadPlaylist(playlist,0, 0)             
         //event.target.mute();
         balanceVolume()
       }
@@ -139,17 +151,14 @@
         }
       }
       function stopVideo() {
-        player.stopVideo();
+        playerLeft.stopVideo();
         playerRight.stopVideo();
       }
       function setVolume(volume) {
-        player.setVolume(100 - volume)
+        playerLeft.setVolume(100 - volume)
         playerRight.setVolume(volume)
 
     }
-      function getVolume() {
-        return player.getVolume()
-      }
 
     /*** Slider ****************************************/
     var slider = document.getElementById("myRange");
@@ -163,7 +172,8 @@
     }
 
     function balanceVolume(){
-        slider.volume = 0
+        slider.value = 0
+        setVolume(0)
     }
 
     </script>
