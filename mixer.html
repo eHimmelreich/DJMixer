@@ -55,23 +55,38 @@
   <div class="container-fluid">
 
     <div class="row" id="players">
-      <div class="col">
+      <div class="input-group mb-3">
+        <input id="playlistLeft" type="text" class="form-control" name="playlistLeft" placeholder="Playlist URL" value="">
+        <button class="btn btn-outline-secondary" type="button" id="load-playlist-left" onclick="loadYouTubeAPI()">Load</button>
+      </div>
+
+      <div class="col s6">
         <div id="panelLeft">
-          <input id="playlistLeft" type="text" class="form-control" name="playlistLeft" placeholder="Playlist URL">
+          <!-- <div class="input-group mb-3">
+            <input id="playlistLeft" type="text" class="form-control" name="playlistLeft" placeholder="Playlist URL" value="">
+            <button class="btn btn-outline-secondary" type="button" id="load-playlist-left" onclick="loadPlaylist('playerLeft')">Load</button>
+          </div> -->
+
           <div id="playerLeft"></div>
+
           <div id="controlsLeft" class="controls">
-            <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" />
-            <input type="button" id="play-left" class="btn btn-outline-secondary" value="Resume" />
+            <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerLeft')"/>
+            <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerLeft')"/>
           </div>  
         </div>
       </div>
-      <div class="col">
+      <div class="col s6">
         <div id="panelRight">
-          <input id="playlistRight" type="text" class="form-control" name="playlistRight" placeholder="Playlist URL">
+          <!-- <div class="input-group mb-3">
+            <input id="playlistRight" type="text" class="form-control" name="playlistRight" placeholder="Playlist URL" value="">
+            <button class="btn btn-outline-secondary" type="button" id="load-playlist-right" onclick="loadPlaylist('playerRight')">Load</button>
+          </div> -->
+        
           <div id="playerRight"></div>
+
           <div id="controlsRight" class="controls">
-            <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" />
-            <input type="button" id="play-right" class="btn btn-outline-secondary" value="Resume" />
+            <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerRight')"/>
+            <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerRight')"/>
           </div>    
         </div>
       </div>
@@ -81,6 +96,7 @@
       <input type="button" id="fade-left" class="btn btn-outline-secondary" value="<= Fade Left"/>
       <div class="range">
         <input type="range" class="form-range" id="myRange"  name="range" min="0" max="100" value="0" onchange="range.value=value">
+        <input id="range" type="hidden"/>
       </div>
       <input type="button" id="fade-right" class="btn btn-outline-secondary" value="Fade Right =>"/>
       <p><span id="slider"></span></p>
@@ -89,23 +105,46 @@
   </div>
 
   <script>
-    // 2. This code loads the IFrame Player API code asynchronously.
-    var tag = document.createElement('script');
 
-    tag.src = "https://www.youtube.com/iframe_api";
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    var playerLeft;
+    var playerRight;
 
+    var readyPlayersCount = 0
+
+    function loadYouTubeAPI() {
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);  
+    }
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
-    var playerLeft;
-    function onYouTubeIframeAPIReady() {
 
-      playerLeft = initPlayer('playerLeft', 'PLmemCpSltdCElMt_4v61EjWe4YPce1n88')
+    function onYouTubeIframeAPIReady() {
+      playlistID = document.getElementById('playlistLeft').value;
+
+      //https://www.youtube.com/playlist?list=PLmemCpSltdCHDk699YqlQq9F4B3ExWgA_
+      if (playlistID.startsWith('https://') && playlistID.indexOf('list=') != -1) {
+        const params = new URLSearchParams(playlistID.split('?')[1]);
+        console.log(params.toString())
+        playlistID = params.get('list')
+      }
+
+      initAllPlayers(playlistID);
+    }
+
+    function initAllPlayers(playlistID){
+
+      playerLeft = undefined;
+      playerRight = undefined;
+      
+      playerLeft = initPlayer('playerLeft', playlistID);
 
       // Delay loading as google is blocking requests
       setTimeout(function () {
-        playerRight = initPlayer('playerRight', 'PLmemCpSltdCElMt_4v61EjWe4YPce1n88')
+        playerRight = initPlayer('playerRight', playlistID);
       }, 1000);
     }
 
@@ -115,12 +154,11 @@
         playlistID = 'PL' + playlistID
       }
 
-      p = new YT.Player(playerId, {
+      let p = new YT.Player(playerId, {
         //height: '390',
         width: '100%',
-        //videoId: 'fI7mF5CTvcM',
         playerVars: {
-          playsinline: 1,
+          playsinline: 1,  //inline on iOS
           autoplay: 0,
           controls: 1,
           showinfo: 0,
@@ -129,8 +167,8 @@
           enablejsapi: 1,
           // 'modestbranding': 0,
           // 'loop': 1,
-          fs: 0,
-          rel: 0,
+          fs: 0, //full screen
+          rel: 0, //do not show related videos
         },
         events: {
           'onReady': onPlayerReady,
@@ -142,14 +180,23 @@
 
     // 4. The API will call this function when the video player is ready.
     function onPlayerReady(event) {
-      //event.target.playVideo();
 
-      playlist = ['qlmOSPnlmww', 'MmeiSgwaaJE']
+      readyPlayersCount += 1;
 
-      //playerLeft.loadPlaylist(playlist,0, 0)             
-      //playerRight.loadPlaylist(playlist,0, 0)             
-      //event.target.mute();
-      balanceVolume()
+      if (readyPlayersCount == 2) {
+        //event.target.playVideo();
+
+        //playlist = ['qlmOSPnlmww', 'MmeiSgwaaJE']
+        //playerLeft.loadPlaylist(playlist,0, 0)             
+        //playerRight.loadPlaylist(playlist,0, 0)             
+        //event.target.mute();
+        console.log('onPlayerReady');
+        console.log(event);
+
+        balanceVolume();
+      } else {
+        console.log('Skipping first player...');
+      }
     }
 
     // 5. The API calls this function when the player's state changes.
@@ -157,19 +204,47 @@
     //    the player should play for six seconds and then stop.
     var done = false;
     function onPlayerStateChange(event) {
+
+      console.log('onPlayerStateChange');
+      console.log(event);
+      if (event.data == -1  && !done) { // when started to play a video (state=1)
+        event.target.nextVideo()
+        done = true;
+      }
+
       if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
         //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
         done = true;
       }
     }
-    function stopVideo() {
-      playerLeft.stopVideo();
-      playerRight.stopVideo();
+
+    function playVideo(playerID) {
+      if (playerID == 'playerLeft') {
+        playerLeft.playVideo();
+      } else if(playerID == 'playerRight') {
+        playerRight.playVideo();
+      }
     }
+
+    function pauseVideo(playerID) {
+      if (playerID == 'playerLeft') {
+        playerLeft.pauseVideo();
+      } else if(playerID == 'playerRight') {
+        playerRight.pauseVideo();
+      }
+    }
+
+    function stopVideo() {
+      if (playerID == 'playerLeft') {
+        playerLeft.stopVideo();
+      } else if(playerID == 'playerRight') {
+        playerRight.stopVideo();
+      }
+    }
+
     function setVolume(volume) {
       playerLeft.setVolume(100 - volume)
       playerRight.setVolume(volume)
-
     }
 
     /*** Slider ****************************************/
@@ -183,6 +258,21 @@
     function balanceVolume() {
       slider.value = 0
       setVolume(0)
+    }
+
+    function loadPlaylist(playerID, value){
+        playlistURL = document.getElementById('playlistLeft');
+        try {
+          playerLeft.loadPlaylist(playlistURL.value,0, 0);
+        } catch(e) {
+          console.log(e)
+        }
+        try {
+          playerRight.loadPlaylist(playlistURL.value,0, 0);
+        }catch(e) {
+          console.log(e)
+        }
+        //initAllPlayers(playlistURL.value)
     }
 
   </script>
