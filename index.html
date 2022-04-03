@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
-<title>YouTube Mixer - https://developers.google.com/youtube/iframe_api_reference</title>
+<title>YouTube Mixer</title>
+<!-- title>https://developers.google.com/youtube/iframe_api_reference</title -->
 
 <head>
-  <link href="//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
-    @import url(//fonts.googleapis.com/css?family=Roboto:400,300);
-    @import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,300);
+    @import url(https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
 
     body {
-      padding: 70px 0px;
+      padding: 70px 70px;
+      width: 99%;
     } 
 
     .mixer {
@@ -45,6 +47,11 @@
       position: absolute;
       flex-direction: column;
     }
+
+    .range {
+      width: 30%;
+    }
+
   </style>
 
 </head>
@@ -54,53 +61,60 @@
   <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
   <div class="container-fluid">
 
-    <div class="row" id="players">
-      <div class="input-group mb-3">
-        <input id="playlistLeft" type="text" class="form-control" name="playlistLeft" placeholder="Playlist URL" value="">
-        <button class="btn btn-outline-secondary" type="button" id="load-playlist-left" onclick="loadYouTubeAPI()">Load</button>
-      </div>
-
-      <div class="col s6">
-        <div id="panelLeft">
-          <!-- <div class="input-group mb-3">
-            <input id="playlistLeft" type="text" class="form-control" name="playlistLeft" placeholder="Playlist URL" value="">
-            <button class="btn btn-outline-secondary" type="button" id="load-playlist-left" onclick="loadPlaylist('playerLeft')">Load</button>
-          </div> -->
-
-          <div id="playerLeft"></div>
-
-          <div id="controlsLeft" class="controls">
-            <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerLeft')"/>
-            <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerLeft')"/>
-          </div>  
-        </div>
-      </div>
-      <div class="col s6">
-        <div id="panelRight">
-          <!-- <div class="input-group mb-3">
-            <input id="playlistRight" type="text" class="form-control" name="playlistRight" placeholder="Playlist URL" value="">
-            <button class="btn btn-outline-secondary" type="button" id="load-playlist-right" onclick="loadPlaylist('playerRight')">Load</button>
-          </div> -->
-        
-          <div id="playerRight"></div>
-
-          <div id="controlsRight" class="controls">
-            <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerRight')"/>
-            <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerRight')"/>
-          </div>    
+    <div class="row justify-content-center">
+      <div class="col-6">
+        <div class="input-group mb-3">
+          <input id="playlist" type="text" class="form-control" name="playlist" placeholder="Inset Playlist URL here" value="">
+          <button class="btn btn-primary" type="button" id="load-playlist-left" onclick="loadYouTubeAPI()" data-bs-toggle="collapse" data-bs-target="#collapseExample">Load</button>
         </div>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center align-items-center align-content-around">
-      <input type="button" id="fade-left" class="btn btn-outline-secondary" value="<= Fade Left"/>
-      <div class="range">
-        <input type="range" class="form-range" id="myRange"  name="range" min="0" max="100" value="0" onchange="range.value=value">
-        <input id="range" type="hidden"/>
+
+    <div class="collapse" id="collapseExample">
+      <div class="row" id="players">
+
+        <div class="col s6">
+          <div id="panelLeft">
+
+            <div id="playerLeft"></div>
+
+            <div id="controlsLeft" class="controls">
+              <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerLeft')"/>
+              <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerLeft')"/>
+            </div>  
+
+          </div>
+        </div>
+        <div class="col s6">
+          <div id="panelRight">
+          
+            <div id="playerRight"></div>
+
+            <div id="controlsRight" class="controls">
+              <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerRight')"/>
+              <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerRight')"/>
+            </div>
+          </div>
+        </div>
       </div>
-      <input type="button" id="fade-right" class="btn btn-outline-secondary" value="Fade Right =>"/>
-      <p><span id="slider"></span></p>
+
+      <div class="d-flex justify-content-center align-items-center align-content-around">
+        <!-- <input type="button" id="fade-left" class="btn btn-outline-secondary" value="<= Fade Left"/> -->
+        <div class="range">
+          <input type="range" class="form-range" id="myRange"  name="range" min="0" max="100" value="0" onchange="range.value=value">
+          <input id="range" type="hidden"/>
+        </div>
+        <!-- <input type="button" id="fade-right" class="btn btn-outline-secondary" value="Fade Right =>"/> -->
+        <p><span id="slider"></span></p>
+      </div>
+
     </div>
+
+
+
+
+    <textarea class="form-control" id="console" readonly rows="3"></textarea>
 
   </div>
 
@@ -110,6 +124,10 @@
     var playerRight;
 
     var readyPlayersCount = 0
+
+    function unhideDOM() {
+
+    }
 
     function loadYouTubeAPI() {
       // 2. This code loads the IFrame Player API code asynchronously.
@@ -123,7 +141,7 @@
     //    after the API code downloads.
 
     function onYouTubeIframeAPIReady() {
-      playlistID = document.getElementById('playlistLeft').value;
+      playlistID = document.getElementById('playlist').value;
 
       //https://www.youtube.com/playlist?list=PLmemCpSltdCHDk699YqlQq9F4B3ExWgA_
       if (playlistID.startsWith('https://') && playlistID.indexOf('list=') != -1) {
@@ -172,10 +190,42 @@
         },
         events: {
           'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
+          'onStateChange': onPlayerStateChange,
+          'onError': onPlayerError,
         }
       });
       return p;
+    }
+
+    // 2 – The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.
+    // 5 – The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.
+    // 100 – The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.
+    // 101 – The owner of the requested video does not allow it to be played in embedded players.
+    // 150 – This error is the same as 101. It's just a 101 error in disguise!
+
+    function onPlayerError(event) {
+      let msg = ''
+      switch(event.data) {
+        case 2:
+          msg = 'The request contains an invalid parameter value';
+          break;
+        case 5:
+          msg = 'The video cannot be played in an HTML5 player';
+          break;
+        case 100:
+          msg = 'The video requested was not found or has been marked as private';
+          break;
+        case 101:
+          msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          break;
+        case 150:
+          msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          break;
+        default:
+          msg = 'Unknown error...';
+          break;
+      }
+      log('Player Error: '+ msg)
     }
 
     // 4. The API will call this function when the video player is ready.
@@ -202,15 +252,25 @@
     // 5. The API calls this function when the player's state changes.
     //    The function indicates that when playing a video (state=1),
     //    the player should play for six seconds and then stop.
+
+    // -1 – unstarted ----
+    // 0 – ended - YT.PlayerState.ENDED
+    // 1 – playing - YT.PlayerState.PLAYING
+    // 2 – paused - YT.PlayerState.PAUSED
+    // 3 – buffering - YT.PlayerState.BUFFERING
+    // 5 – video cued - YT.PlayerState.CUED
+
+
     var done = false;
     function onPlayerStateChange(event) {
 
       console.log('onPlayerStateChange');
-      console.log(event);
-      if (event.data == -1  && !done) { // when started to play a video (state=1)
-        event.target.nextVideo()
-        done = true;
-      }
+
+      // if (event.data == -1  && !done) { // when started to play a video (state=1)
+      //   //event.target.nextVideo()
+      //   log('Video is unavailable...', event)
+      //   done = true;
+      // }
 
       if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
         //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
@@ -261,7 +321,7 @@
     }
 
     function loadPlaylist(playerID, value){
-        playlistURL = document.getElementById('playlistLeft');
+        playlistURL = document.getElementById('playlist');
         try {
           playerLeft.loadPlaylist(playlistURL.value,0, 0);
         } catch(e) {
@@ -273,6 +333,11 @@
           console.log(e)
         }
         //initAllPlayers(playlistURL.value)
+    }
+
+    function log(text){
+      textArea = document.getElementById('console')
+      textArea.value += '\n' + text;
     }
 
   </script>
