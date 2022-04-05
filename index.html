@@ -64,14 +64,13 @@
     <div class="row justify-content-center">
       <div class="col-6">
         <div class="input-group mb-3">
-          <input id="playlist" type="text" class="form-control" name="playlist" placeholder="Inset YouTube playlist URL here" value="">
-          <button class="btn btn-primary" type="button" id="load-playlist-left" onclick="loadYouTubeAPI()" data-bs-toggle="collapse" data-bs-target="#collapseExample">Load</button>
+          <input id="playlist" type="text" class="form-control" name="playlist" placeholder="YouTube playlist URL" value="">
+          <button class="btn btn-primary" type="button" id="load-playlist-left" onclick="loadYouTubeAPI()" >Load</button>
         </div>
       </div>
     </div>
 
-
-    <div class="collapse" id="collapseExample">
+    <div id="players-container">
       <div class="row" id="players">
 
         <div class="col s6">
@@ -117,7 +116,7 @@
     <textarea class="form-control" id="console" readonly rows="3"></textarea>
 
   </div>
-
+  <script async src="https://www.youtube.com/iframe_api"></script>
   <script>
 
     var playerReady = false;
@@ -129,21 +128,15 @@
     function loadYouTubeAPI() {
 
       if (playerReady) {
-        loadPlaylist()
-      } else {
-        // Load IFrame Player API code
-        var tag = document.createElement('script');
-
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);  
+        playlistID = getPlaylistID(document.getElementById('playlist').value);
+        initAllPlayers(playlistID);
       }
     }
+
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
 
     function getPlaylistID(playlistID) {
-      //https://www.youtube.com/playlist?list=PLmemCpSltdCHDk699YqlQq9F4B3ExWgA_
       if (playlistID.startsWith('https://') && playlistID.indexOf('list=') != -1) {
         const params = new URLSearchParams(playlistID.split('?')[1]);
         console.log(params.toString())
@@ -161,8 +154,8 @@
 
     function initAllPlayers(playlistID){
 
-      playerLeft = undefined;
-      playerRight = undefined;
+      if (playerLeft) {playerLeft.destroy();}
+      if (playerRight) {playerRight.destroy();}
       
       playerLeft = initPlayer('playerLeft', playlistID);
 
@@ -220,12 +213,15 @@
           break;
         case 100:
           msg = 'The video requested was not found or has been marked as private';
+          event.target.nextVideo();
           break;
         case 101:
           msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          event.target.nextVideo();
           break;
         case 150:
           msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          event.target.nextVideo();
           break;
         default:
           msg = 'Unknown error...';
@@ -240,12 +236,6 @@
       readyPlayersCount += 1;
 
       if (readyPlayersCount == 2) {
-        //event.target.playVideo();
-
-        //playlist = ['qlmOSPnlmww', 'MmeiSgwaaJE']
-        //playerLeft.loadPlaylist(playlist,0, 0)             
-        //playerRight.loadPlaylist(playlist,0, 0)             
-        //event.target.mute();
         console.log('onPlayerReady');
         console.log(event);
 
@@ -328,10 +318,11 @@
     }
 
     function loadPlaylist(){
-        playlistID = getPlaylistID(document.getElementById('playlist').value);
+      debugger;
+      playlistID = getPlaylistID(document.getElementById('playlist').value);
 
-        playerLeft.loadPlaylist({ list: playlistID });
-        playerRight.loadPlaylist({ list: playlistID });
+      playerLeft.loadPlaylist(playlistID, 0, 0);
+      playerRight.loadPlaylist(playlistID, 0, 0);
     }
 
     function log(text){
