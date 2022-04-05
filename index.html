@@ -168,33 +168,35 @@
 
     function initPlayer(playerId, playlistID) {
 
-      if (playlistID.startsWith('PL') == false) {
-        playlistID = 'PL' + playlistID
-      }
-
-      let p = new YT.Player(playerId, {
-        //height: '390',
-        width: '100%',
-        playerVars: {
+      playerVars = {
           playsinline: 1,  //inline on iOS
           autoplay: 0,
           controls: 1,
           showinfo: 0,
-          listType: 'playlist',
-          list: playlistID,
           enablejsapi: 1,
           modestbranding: 1,
           autohide: 0,
           // 'loop': 1,
           fs: 0, //full screen
           rel: 0, //do not show related videos
-        },
+        }
+
+      if (playlistID) {
+        playerVars.listType = 'playlist';
+        playerVars.list = playlistID;
+      }
+
+      let p = new YT.Player(playerId, {
+        //height: '390',
+        width: '100%',
+        playerVars: playerVars,
         events: {
           'onReady': onPlayerReady,
           'onStateChange': onPlayerStateChange,
           'onError': onPlayerError,
         }
       });
+
       return p;
     }
 
