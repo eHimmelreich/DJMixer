@@ -79,8 +79,10 @@
             <div id="playerLeft"></div>
 
             <div id="controlsLeft" class="controls">
+              <input type="button" id="previous-left" class="btn btn-outline-secondary" value="Previous" onclick="previousVideo('playerLeft')"/>
               <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerLeft')"/>
               <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerLeft')"/>
+              <input type="button" id="next-left" class="btn btn-outline-secondary" value="Next" onclick="nextVideo('playerLeft')"/>
             </div>  
 
           </div>
@@ -91,31 +93,30 @@
             <div id="playerRight"></div>
 
             <div id="controlsRight" class="controls">
+              <input type="button" id="previous-right" class="btn btn-outline-secondary" value="Previous" onclick="previousVideo('playerRight')"/>
               <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerRight')"/>
               <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerRight')"/>
+              <input type="button" id="next-right" class="btn btn-outline-secondary" value="Next" onclick="nextVideo('playerRight')"/>
+
             </div>
           </div>
         </div>
       </div>
 
       <div class="d-flex justify-content-center align-items-center align-content-around">
-        <!-- <input type="button" id="fade-left" class="btn btn-outline-secondary" value="<= Fade Left"/> -->
         <div class="range">
           <input type="range" class="form-range" id="myRange"  name="range" min="0" max="100" value="0" onchange="range.value=value">
           <input id="range" type="hidden"/>
         </div>
-        <!-- <input type="button" id="fade-right" class="btn btn-outline-secondary" value="Fade Right =>"/> -->
         <p><span id="slider"></span></p>
       </div>
 
     </div>
 
-
-
-
     <textarea class="form-control" id="console" readonly rows="3"></textarea>
 
   </div>
+ 
   <script async src="https://www.youtube.com/iframe_api"></script>
   <script>
 
@@ -182,7 +183,8 @@
           listType: 'playlist',
           list: playlistID,
           enablejsapi: 1,
-          // 'modestbranding': 0,
+          modestbranding: 1,
+          autohide: 0,
           // 'loop': 1,
           fs: 0, //full screen
           rel: 0, //do not show related videos
@@ -204,6 +206,7 @@
 
     function onPlayerError(event) {
       let msg = ''
+
       switch(event.data) {
         case 2:
           msg = 'The request contains an invalid parameter value';
@@ -227,7 +230,7 @@
           msg = 'Unknown error...';
           break;
       }
-      log('Player Error: '+ msg)
+      log('Player Error: ' + event.target.getVideoData().title + ' - ' +msg)
     }
 
     // 4. The API will call this function when the video player is ready.
@@ -262,15 +265,9 @@
     function onPlayerStateChange(event) {
 
       console.log('onPlayerStateChange');
-
-      // if (event.data == -1  && !done) { // when started to play a video (state=1)
-      //   //event.target.nextVideo()
-      //   log('Video is unavailable...', event)
-      //   done = true;
-      // }
-
       if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
         //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
+        log('Play: ' + event.target.getVideoData().title)
         done = true;
       }
     }
@@ -291,11 +288,30 @@
       }
     }
 
+    function nextVideo(playerID) {
+      if (playerID == 'playerLeft') {
+        playerLeft.nextVideo();
+      } else if(playerID == 'playerRight') {
+        playerRight.nextVideo();
+      }
+    }
+
+    function previousVideo(playerID) {
+      if (playerID == 'playerLeft') {
+        playerLeft.previousVideo();
+      } else if(playerID == 'playerRight') {
+        playerRight.previousVideo();
+      }
+    }
+
     function stopVideo() {
       if (playerID == 'playerLeft') {
         playerLeft.stopVideo();
+        log('Left: stop ' + playerLeft.getVideoData().title)
+
       } else if(playerID == 'playerRight') {
         playerRight.stopVideo();
+        log('Right: stop ' + playerRight.getVideoData().title)
       }
     }
 
@@ -323,11 +339,15 @@
 
       playerLeft.loadPlaylist(playlistID, 0, 0);
       playerRight.loadPlaylist(playlistID, 0, 0);
+
     }
 
     function log(text){
       textArea = document.getElementById('console')
       textArea.value += '\n' + text;
+
+      textArea.scrollTop = textArea.scrollHeight 
+
     }
 
   </script>
