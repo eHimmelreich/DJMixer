@@ -120,29 +120,29 @@
 
   <script>
 
+    var playerReady = false;
     var playerLeft;
     var playerRight;
 
     var readyPlayersCount = 0
 
-    function unhideDOM() {
-
-    }
-
     function loadYouTubeAPI() {
-      // 2. This code loads the IFrame Player API code asynchronously.
-      var tag = document.createElement('script');
 
-      tag.src = "https://www.youtube.com/iframe_api";
-      var firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);  
+      if (playerReady) {
+        loadPlaylist()
+      } else {
+        // Load IFrame Player API code
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);  
+      }
     }
     // 3. This function creates an <iframe> (and YouTube player)
     //    after the API code downloads.
 
-    function onYouTubeIframeAPIReady() {
-      playlistID = document.getElementById('playlist').value;
-
+    function getPlaylistID(playlistID) {
       //https://www.youtube.com/playlist?list=PLmemCpSltdCHDk699YqlQq9F4B3ExWgA_
       if (playlistID.startsWith('https://') && playlistID.indexOf('list=') != -1) {
         const params = new URLSearchParams(playlistID.split('?')[1]);
@@ -150,6 +150,12 @@
         playlistID = params.get('list')
       }
 
+      return playlistID;
+
+    }
+
+    function onYouTubeIframeAPIReady() {
+      playlistID = getPlaylistID(document.getElementById('playlist').value);
       initAllPlayers(playlistID);
     }
 
@@ -244,6 +250,7 @@
         console.log(event);
 
         balanceVolume();
+        playerReady = true;
       } else {
         console.log('Skipping first player...');
       }
@@ -320,19 +327,11 @@
       setVolume(0)
     }
 
-    function loadPlaylist(playerID, value){
-        playlistURL = document.getElementById('playlist');
-        try {
-          playerLeft.loadPlaylist(playlistURL.value,0, 0);
-        } catch(e) {
-          console.log(e)
-        }
-        try {
-          playerRight.loadPlaylist(playlistURL.value,0, 0);
-        }catch(e) {
-          console.log(e)
-        }
-        //initAllPlayers(playlistURL.value)
+    function loadPlaylist(){
+        playlistID = getPlaylistID(document.getElementById('playlist').value);
+
+        playerLeft.loadPlaylist({ list: playlistID });
+        playerRight.loadPlaylist({ list: playlistID });
     }
 
     function log(text){
