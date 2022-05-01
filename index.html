@@ -125,6 +125,8 @@
     var playerLeft;
     var playerRight;
 
+    var cantPlayURL = '';
+
     var readyPlayersCount = 0
 
     function loadYouTubeAPI() {
@@ -210,30 +212,35 @@
     function onPlayerError(event) {
       let msg = ''
 
+      if (event.target.getVideoUrl() == cantPlayURL) {
+        return
+      }
+      cantPlayURL = event.target.getVideoUrl(); 
       switch(event.data) {
         case 2:
-          msg = 'The request contains an invalid parameter value';
+          msg = event.target.getVideoUrl() + ' The request contains an invalid parameter value';
           break;
         case 5:
-          msg = 'The video cannot be played in an HTML5 player';
+          msg = event.target.getVideoUrl() + ' The video cannot be played in an HTML5 player';
           break;
         case 100:
-          msg = 'The video requested was not found or has been marked as private';
+          msg = event.target.getVideoUrl() + ' The video requested was not found or has been marked as private';
           event.target.nextVideo();
           break;
         case 101:
-          msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          msg = event.target.getVideoUrl() + ' The owner of the requested video does not allow it to be played in embedded players.';
           event.target.nextVideo();
           break;
         case 150:
-          msg = 'The owner of the requested video does not allow it to be played in embedded players.';
+          msg = event.target.getVideoUrl() + ' The owner of the requested video does not allow it to be played in embedded players.';
           event.target.nextVideo();
           break;
         default:
           msg = 'Unknown error...';
           break;
       }
-      log('Player Error: ' + event.target.getVideoData().title + ' - ' +msg)
+      log('Player Error: ' + event.target.getVideoData().title + ' - ' + msg)
+      
     }
 
     // 4. The API will call this function when the video player is ready.
@@ -270,7 +277,7 @@
       console.log('onPlayerStateChange');
       if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
         //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
-        log('Play: ' + event.target.getVideoData().title)
+        log('Play: ' + event.target.getVideoData().title + 'URL: ' + event.target.getVideoUrl())
         done = true;
       }
     }
