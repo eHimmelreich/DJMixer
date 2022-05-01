@@ -218,21 +218,21 @@
       cantPlayURL = event.target.getVideoUrl(); 
       switch(event.data) {
         case 2:
-          msg = event.target.getVideoUrl() + ' The request contains an invalid parameter value';
+          msg = ' The request contains an invalid parameter value';
           break;
         case 5:
-          msg = event.target.getVideoUrl() + ' The video cannot be played in an HTML5 player';
+          msg = ' The video cannot be played in an HTML5 player';
           break;
         case 100:
-          msg = event.target.getVideoUrl() + ' The video requested was not found or has been marked as private';
+          msg = ' The video requested was not found or has been marked as private';
           event.target.nextVideo();
           break;
         case 101:
-          msg = event.target.getVideoUrl() + ' The owner of the requested video does not allow it to be played in embedded players.';
+          msg = ' The owner of the requested video does not allow it to be played in embedded players.';
           event.target.nextVideo();
           break;
         case 150:
-          msg = event.target.getVideoUrl() + ' The owner of the requested video does not allow it to be played in embedded players.';
+          msg = ' The owner of the requested video does not allow it to be played in embedded players.';
           event.target.nextVideo();
           break;
         default:
