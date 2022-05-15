@@ -80,10 +80,10 @@
             <div id="playerLeft"></div>
 
             <div id="controlsLeft" class="controls">
-              <input type="button" id="previous-left" class="btn btn-outline-secondary" value="Previous" onclick="previousVideo('playerLeft')"/>
-              <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerLeft')"/>
-              <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerLeft')"/>
-              <input type="button" id="next-left" class="btn btn-outline-secondary" value="Next" onclick="nextVideo('playerLeft')"/>
+              <input type="button" id="previous-left" class="btn btn-outline-secondary" value="|< Previous" onclick="previousVideo('playerLeft')"/>
+              <input type="button" id="play-left" class="btn btn-outline-secondary" value="Play >" onclick="playVideo('playerLeft')"/>
+              <input type="button" id="pause-left" class="btn btn-outline-secondary" value="Pause ||" onclick="pauseVideo('playerLeft')"/>
+              <input type="button" id="next-left" class="btn btn-outline-secondary" value="Next >|" onclick="nextVideo('playerLeft')"/>
             </div>  
 
           </div>
@@ -94,10 +94,10 @@
             <div id="playerRight"></div>
 
             <div id="controlsRight" class="controls">
-              <input type="button" id="previous-right" class="btn btn-outline-secondary" value="Previous" onclick="previousVideo('playerRight')"/>
-              <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play" onclick="playVideo('playerRight')"/>
-              <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause" onclick="pauseVideo('playerRight')"/>
-              <input type="button" id="next-right" class="btn btn-outline-secondary" value="Next" onclick="nextVideo('playerRight')"/>
+              <input type="button" id="previous-right" class="btn btn-outline-secondary" value="|< Previous" onclick="previousVideo('playerRight')"/>
+              <input type="button" id="play-right" class="btn btn-outline-secondary" value="Play >" onclick="playVideo('playerRight')"/>
+              <input type="button" id="pause-right" class="btn btn-outline-secondary" value="Pause ||" onclick="pauseVideo('playerRight')"/>
+              <input type="button" id="next-right" class="btn btn-outline-secondary" value="Next >|" onclick="nextVideo('playerRight')"/>
 
             </div>
           </div>
@@ -252,7 +252,7 @@
         console.log('onPlayerReady');
         console.log(event);
 
-        balanceVolume();
+        balanceVolume();      
         playerReady = true;
       } else {
         console.log('Skipping first player...');
@@ -274,7 +274,7 @@
     var done = false;
     function onPlayerStateChange(event) {
 
-      console.log('onPlayerStateChange');
+      console.log('onPlayerStateChange:' + event.data);
       if (event.data == YT.PlayerState.PLAYING && !done) { // when started to play a video (state=1)
         //setTimeout(stopVideo, 6000); - stop after 6 seconds of playing
         log('Play: ' + event.target.getVideoData().title + 'URL: ' + event.target.getVideoUrl())
@@ -314,14 +314,12 @@
       }
     }
 
-    function stopVideo() {
+    function stopVideo(playerID) {
       if (playerID == 'playerLeft') {
         playerLeft.stopVideo();
-        log('Left: stop ' + playerLeft.getVideoData().title)
 
       } else if(playerID == 'playerRight') {
         playerRight.stopVideo();
-        log('Right: stop ' + playerRight.getVideoData().title)
       }
     }
 
@@ -346,8 +344,18 @@
     function loadPlaylist(){
       playlistID = getPlaylistID(document.getElementById('playlist').value);
 
-      playerLeft.loadPlaylist({list:playlistID, listType:'playlist', index:0});
-      playerRight.loadPlaylist({list:playlistID, listType:'playlist', index:0});
+      initAllPlayers(playlistID)
+
+      //playerLeft.cuePlaylist({list:playlistID, listType:'playlist', index:0});
+      //playerRight.cuePlaylist({list:playlistID, listType:'playlist', index:0}); 
+      
+      setTimeout(function () {
+        balanceVolume();
+      }, 2000);
+
+      stopVideo('leftPLayer');
+      stopVideo('rightPLayer');
+
     }
 
     function log(text){
